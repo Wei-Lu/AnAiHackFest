@@ -49,29 +49,22 @@ def main(args):
 
     #sample user code df
     data_str = df.to_string(index=False)
-    user_request = "duplicate payments"
+    user_request = "find all duplicate payments"
     columns_to_check = ' '.join(df.columns)
-    column_names = ' '.join(df.columns.str.strip())
-    columns_inresult = 'last_name, first_name, pay_on, salary, record_number'
  #   columns_to_check = "last_name and first_name and salary and pay_on must be the same"
+    prompt = f"""
+    Analyze the following data and  {user_request} based on {columns_to_check}. 
+    Return the result data strictly as a CSV format containing the columns: {columns_to_check}. 
+    Ensure the result is enclosed within the <result></result> tags. Do not include records that are not duplicates.
+    Think step by step. Return the CSV data within the <result></result> tags.
 
-    sys_prompt = f"""
-    You must only answer factually and concisely. If unsure, say 'I don't know'.
-    Ensure the result is enclosed within the <result></result> tags.
-    Return the CSV data within the <result></result> tags.
-    """
-
-    user_prompt = f"""
-    Analyze the following data and find all {user_request} based on {columns_to_check}. 
-    Return the result data strictly as a CSV format containing the columns: {columns_inresult}. 
- 
     {data_str}
     """
 
     # Send the request to Ollama
-    response = ollama.chat(model="mistral", messages=[{"role": "system", "content": sys_prompt},
-                                                      {"role": "user", "content": user_prompt}], options={"temperature": 0.0})
-    print("response")
+    response = ollama.chat(model="mistral", messages=[{"role": "system", "content": "You must only answer factually and concisely. If unsure, say 'I don't know'."},
+                                                      {"role": "user", "content": prompt}], options={"temperature": 0.0})
+    logger.info("response")
     logger.info(response["message"]["content"])   
     try:
         usrdf = extract_result_to_dataframe(response["message"]["content"])
@@ -79,7 +72,7 @@ def main(args):
         logger.error("ZeroDivisionError: No <result> block found in the input string.")
         return -1
 
-    print(usrdf)   
+    logger.info(usrdf)   
     #end user operations
 
 
