@@ -45,11 +45,12 @@ def main(args):
 
     df = acl_py_util.from_an()
 
-    logger.info(df)
+    #logger.info(df)
 
     #sample user code df
     data_str = df.to_string(index=False)
-    user_request = "find all duplicate payments"
+    user_request = os.getenv("ACL_USER_PROMPT")
+    #user_request = "find all duplicate payments"
     columns_to_check = ' '.join(df.columns)
  #   columns_to_check = "last_name and first_name and salary and pay_on must be the same"
     prompt = f"""
@@ -64,15 +65,15 @@ def main(args):
     # Send the request to Ollama
     response = ollama.chat(model="mistral", messages=[{"role": "system", "content": "You must only answer factually and concisely. If unsure, say 'I don't know'."},
                                                       {"role": "user", "content": prompt}], options={"temperature": 0.0})
-    logger.info("response")
-    logger.info(response["message"]["content"])   
+    #logger.info("response")
+    #logger.info(response["message"]["content"])   
     try:
         usrdf = extract_result_to_dataframe(response["message"]["content"])
     except ValueError:
         logger.error("ZeroDivisionError: No <result> block found in the input string.")
         return -1
 
-    logger.info(usrdf)   
+    #logger.info(usrdf)   
     #end user operations
 
 

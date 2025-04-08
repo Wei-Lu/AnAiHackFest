@@ -1,0 +1,15 @@
+#Ignore some personal files
+*.txt
+*.fil
+*.acl
+*.dbp
+*.dat
+*.AC
+*.xml
+*.LOG
+*.old
+.gitmodules
+
+#ignore thumbnails created by windows
+Thumbs.db
+
